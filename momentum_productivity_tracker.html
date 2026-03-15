@@ -1,0 +1,372 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d0d;
+    --surface: #141414;
+    --surface2: #1a1a1a;
+    --surface3: #222222;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #f0ede6;
+    --muted: #888580;
+    --dim: #555250;
+    --amber: #e8a237;
+    --amber2: #c47d12;
+    --amber-dim: rgba(232,162,55,0.12);
+    --amber-glow: rgba(232,162,55,0.06);
+    --green: #4caf7d;
+    --red: #e05a4b;
+    --serif: 'Playfair Display', Georgia, serif;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Lato', sans-serif;
+    --r: 6px;
+    --r2: 10px;
+  }
+
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
+
+  .app { max-width: 540px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  .header { text-align: center; margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 0.5px solid var(--border); }
+  .header-title { font-family: var(--serif); font-size: 13px; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+  .header-date { font-family: var(--mono); font-size: 11px; color: var(--dim); letter-spacing: 0.05em; }
+
+  .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 1.5rem; }
+
+  .stat-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r); padding: 0.875rem 0.75rem; text-align: center; }
+  .stat-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); font-family: var(--mono); margin-bottom: 6px; }
+  .stat-value { font-family: var(--serif); font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
+  .stat-value.amber { color: var(--amber); }
+  .stat-sub { font-size: 10px; color: var(--dim); font-family: var(--mono); margin-top: 4px; }
+
+  .xp-section { margin-bottom: 1.5rem; }
+  .xp-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .xp-label { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.08em; }
+  .xp-level { font-family: var(--serif); font-size: 13px; color: var(--amber); font-weight: 500; }
+  .xp-bar-bg { background: var(--surface2); border-radius: 2px; height: 3px; overflow: hidden; }
+  .xp-bar-fill { height: 100%; background: var(--amber); border-radius: 2px; transition: width 0.6s cubic-bezier(.22,.68,0,1.2); }
+  .xp-detail { display: flex; justify-content: space-between; margin-top: 6px; }
+  .xp-pts { font-family: var(--mono); font-size: 10px; color: var(--dim); }
+
+  .add-area { margin-bottom: 1.75rem; }
+  .input-row { display: flex; gap: 8px; align-items: center; }
+  .task-input { flex: 1; background: var(--surface); border: 0.5px solid var(--border2); border-radius: var(--r); color: var(--text); font-family: var(--mono); font-size: 13px; padding: 10px 14px; outline: none; transition: border-color 0.2s; }
+  .task-input::placeholder { color: var(--dim); }
+  .task-input:focus { border-color: var(--amber2); }
+  .priority-btn { background: var(--surface); border: 0.5px solid var(--border2); border-radius: var(--r); padding: 10px 10px; cursor: pointer; font-size: 14px; transition: background 0.15s; color: var(--muted); font-family: var(--mono); font-size: 12px; white-space: nowrap; }
+  .priority-btn:hover { background: var(--surface3); }
+  .priority-btn.high { color: var(--red); border-color: rgba(224,90,75,0.3); }
+  .priority-btn.med { color: var(--amber); border-color: rgba(232,162,55,0.3); }
+  .priority-btn.low { color: var(--green); border-color: rgba(76,175,125,0.3); }
+  .add-btn { background: var(--amber); color: #1a0f00; border: none; border-radius: var(--r); padding: 10px 16px; cursor: pointer; font-family: var(--mono); font-size: 13px; font-weight: 500; transition: background 0.15s, transform 0.1s; }
+  .add-btn:hover { background: #f0ae3e; }
+  .add-btn:active { transform: scale(0.97); }
+
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+  .section-title { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--dim); }
+  .section-count { font-family: var(--mono); font-size: 10px; color: var(--dim); background: var(--surface2); padding: 2px 7px; border-radius: 99px; }
+
+  .tasks-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.75rem; }
+
+  .task-item { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r); display: flex; align-items: center; gap: 10px; padding: 10px 12px; transition: border-color 0.2s, background 0.2s; cursor: default; }
+  .task-item:hover { border-color: var(--border2); background: var(--surface2); }
+  .task-item.done { opacity: 0.45; }
+  .task-item.done .task-text { text-decoration: line-through; color: var(--dim); }
+
+  .check-btn { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--border2); background: transparent; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .check-btn:hover { border-color: var(--amber); background: var(--amber-dim); }
+  .task-item.done .check-btn { background: var(--amber); border-color: var(--amber); }
+  .check-mark { width: 8px; height: 5px; border-left: 1.5px solid #1a0f00; border-bottom: 1.5px solid #1a0f00; transform: rotate(-45deg) translate(1px, -1px); display: none; }
+  .task-item.done .check-mark { display: block; }
+
+  .task-text { flex: 1; font-family: var(--mono); font-size: 12px; color: var(--text); }
+  .priority-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .priority-dot.high { background: var(--red); }
+  .priority-dot.med { background: var(--amber); }
+  .priority-dot.low { background: var(--green); }
+  .priority-dot.none { display: none; }
+
+  .del-btn { background: none; border: none; color: var(--dim); cursor: pointer; font-size: 14px; padding: 0 2px; opacity: 0; transition: opacity 0.15s, color 0.15s; line-height: 1; }
+  .task-item:hover .del-btn { opacity: 1; }
+  .del-btn:hover { color: var(--red); }
+
+  .empty-state { text-align: center; padding: 2rem 1rem; color: var(--dim); font-family: var(--mono); font-size: 12px; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface3); border: 0.5px solid var(--border2); color: var(--amber); font-family: var(--mono); font-size: 12px; padding: 10px 18px; border-radius: var(--r2); transition: transform 0.35s cubic-bezier(.22,.68,0,1.2), opacity 0.25s; opacity: 0; white-space: nowrap; z-index: 99; }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  .completed-toggle { background: none; border: none; color: var(--dim); font-family: var(--mono); font-size: 10px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; transition: color 0.15s; padding: 0; }
+  .completed-toggle:hover { color: var(--muted); }
+
+  .divider { height: 0.5px; background: var(--border); margin: 1.5rem 0; }
+
+  .streak-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--amber-glow); border: 0.5px solid rgba(232,162,55,0.2); border-radius: 99px; padding: 3px 10px; font-family: var(--mono); font-size: 11px; color: var(--amber); margin-top: 5px; }
+  .flame { font-size: 12px; }
+</style>
+
+<div class="app">
+  <div class="header">
+    <div class="header-title">Momentum</div>
+    <div class="header-date" id="current-date"></div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Today</div>
+      <div class="stat-value amber" id="stat-today">0</div>
+      <div class="stat-sub">completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Streak</div>
+      <div class="stat-value amber" id="stat-streak">0</div>
+      <div id="streak-badge-wrap"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Best</div>
+      <div class="stat-value" id="stat-best">0</div>
+      <div class="stat-sub">days</div>
+    </div>
+  </div>
+
+  <div class="xp-section">
+    <div class="xp-header">
+      <span class="xp-label">XP Progress</span>
+      <span class="xp-level" id="xp-level-label">Level 1</span>
+    </div>
+    <div class="xp-bar-bg">
+      <div class="xp-bar-fill" id="xp-bar" style="width:0%"></div>
+    </div>
+    <div class="xp-detail">
+      <span class="xp-pts" id="xp-current-pts">0 XP</span>
+      <span class="xp-pts" id="xp-next-pts">next level: 100 XP</span>
+    </div>
+  </div>
+
+  <div class="add-area">
+    <div class="input-row">
+      <input class="task-input" id="task-input" type="text" placeholder="add a task..." maxlength="80" />
+      <button class="priority-btn" id="priority-btn" onclick="cyclePriority()">— none</button>
+      <button class="add-btn" onclick="addTask()">+ add</button>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <span class="section-title">Active</span>
+    <span class="section-count" id="active-count">0</span>
+  </div>
+  <div class="tasks-list" id="active-list"></div>
+
+  <div id="completed-section" style="display:none">
+    <div class="divider"></div>
+    <div class="section-header">
+      <span class="section-title">Completed</span>
+      <button class="completed-toggle" onclick="toggleCompleted()">hide</button>
+    </div>
+    <div class="tasks-list" id="completed-list"></div>
+  </div>
+  <div id="show-completed-wrap" style="display:none; text-align:center; margin-top:1rem;">
+    <button class="completed-toggle" onclick="toggleCompleted()">show completed</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const XP_PER_TASK = 10;
+const XP_PER_LEVEL = 100;
+const STREAK_BONUSES = [[3,10],[7,25],[30,100]];
+
+let state = loadState();
+checkDailyReset();
+render();
+
+document.getElementById('task-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addTask();
+});
+
+document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+
+let priority = 'none';
+function cyclePriority() {
+  const cycle = ['none','low','med','high'];
+  priority = cycle[(cycle.indexOf(priority)+1)%cycle.length];
+  const btn = document.getElementById('priority-btn');
+  const labels = {none:'— none', low:'▲ low', med:'▲ med', high:'▲ high'};
+  btn.textContent = labels[priority];
+  btn.className = 'priority-btn ' + (priority !== 'none' ? priority : '');
+}
+
+function addTask() {
+  const input = document.getElementById('task-input');
+  const text = input.value.trim();
+  if (!text) return;
+  state.tasks.push({ id: Date.now(), text, priority, done: false, createdAt: Date.now() });
+  input.value = '';
+  priority = 'none';
+  const btn = document.getElementById('priority-btn');
+  btn.textContent = '— none';
+  btn.className = 'priority-btn';
+  saveState();
+  render();
+}
+
+function completeTask(id) {
+  const task = state.tasks.find(t => t.id === id);
+  if (!task || task.done) return;
+  task.done = true;
+  task.completedAt = Date.now();
+
+  const today = dateKey(new Date());
+  if (!state.completedDays.includes(today)) {
+    state.completedDays.push(today);
+    updateStreak();
+  }
+
+  let bonus = 0;
+  STREAK_BONUSES.forEach(([days, xp]) => {
+    if (state.streak === days) bonus = xp;
+  });
+
+  state.xp += XP_PER_TASK + bonus;
+  state.totalCompleted = (state.totalCompleted || 0) + 1;
+
+  const msg = bonus > 0
+    ? `+${XP_PER_TASK} XP  +${bonus} streak bonus!`
+    : `+${XP_PER_TASK} XP`;
+  showToast(msg);
+  saveState();
+  render();
+}
+
+function deleteTask(id) {
+  state.tasks = state.tasks.filter(t => t.id !== id);
+  saveState();
+  render();
+}
+
+function updateStreak() {
+  const today = dateKey(new Date());
+  const yesterday = dateKey(new Date(Date.now() - 86400000));
+  if (state.lastStreakDay === yesterday || state.lastStreakDay === today) {
+    if (state.lastStreakDay !== today) state.streak++;
+  } else {
+    state.streak = 1;
+  }
+  state.lastStreakDay = today;
+  state.longestStreak = Math.max(state.longestStreak || 0, state.streak);
+}
+
+function checkDailyReset() {
+  const today = dateKey(new Date());
+  if (state.lastOpenDay && state.lastOpenDay !== today) {
+    if (!state.completedDays.includes(state.lastOpenDay) && state.streak > 0) {
+      const yesterday = dateKey(new Date(Date.now() - 86400000));
+      if (state.lastOpenDay !== yesterday) {
+        state.streak = 0;
+      }
+    }
+  }
+  state.lastOpenDay = today;
+  saveState();
+}
+
+let showCompleted = false;
+function toggleCompleted() {
+  showCompleted = !showCompleted;
+  render();
+}
+
+function render() {
+  const active = state.tasks.filter(t => !t.done);
+  const completed = state.tasks.filter(t => t.done);
+  const todayDone = completed.filter(t => dateKey(new Date(t.completedAt)) === dateKey(new Date())).length;
+
+  document.getElementById('stat-today').textContent = todayDone;
+  document.getElementById('stat-streak').textContent = state.streak;
+  document.getElementById('stat-best').textContent = state.longestStreak || 0;
+
+  const streakWrap = document.getElementById('streak-badge-wrap');
+  if (state.streak >= 3) {
+    const label = state.streak >= 30 ? '30d bonus' : state.streak >= 7 ? '7d bonus' : '3d bonus';
+    streakWrap.innerHTML = `<div class="streak-badge"><span class="flame">&#x25b2;</span> ${label}</div>`;
+  } else {
+    streakWrap.innerHTML = `<div class="stat-sub">days</div>`;
+  }
+
+  const level = Math.floor(state.xp / XP_PER_LEVEL) + 1;
+  const xpInLevel = state.xp % XP_PER_LEVEL;
+  const pct = (xpInLevel / XP_PER_LEVEL) * 100;
+  document.getElementById('xp-level-label').textContent = 'Level ' + level;
+  document.getElementById('xp-bar').style.width = pct + '%';
+  document.getElementById('xp-current-pts').textContent = state.xp + ' XP total';
+  document.getElementById('xp-next-pts').textContent = 'next: ' + (level * XP_PER_LEVEL) + ' XP';
+
+  const al = document.getElementById('active-list');
+  document.getElementById('active-count').textContent = active.length;
+  al.innerHTML = active.length === 0
+    ? '<div class="empty-state">no active tasks — add one above</div>'
+    : active.map(t => taskHTML(t)).join('');
+
+  const cl = document.getElementById('completed-list');
+  const cs = document.getElementById('completed-section');
+  const sw = document.getElementById('show-completed-wrap');
+  if (completed.length > 0) {
+    if (showCompleted) {
+      cs.style.display = 'block';
+      sw.style.display = 'none';
+      cl.innerHTML = completed.map(t => taskHTML(t)).join('');
+    } else {
+      cs.style.display = 'none';
+      sw.style.display = 'block';
+    }
+  } else {
+    cs.style.display = 'none';
+    sw.style.display = 'none';
+  }
+}
+
+function taskHTML(t) {
+  const pd = t.priority !== 'none' ? `<div class="priority-dot ${t.priority}"></div>` : '';
+  return `<div class="task-item ${t.done ? 'done' : ''}" id="task-${t.id}">
+    <button class="check-btn" onclick="completeTask(${t.id})" title="complete">
+      <div class="check-mark"></div>
+    </button>
+    ${pd}
+    <span class="task-text">${escHtml(t.text)}</span>
+    <button class="del-btn" onclick="deleteTask(${t.id})" title="delete">&#xd7;</button>
+  </div>`;
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function dateKey(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('momentum_v1');
+    if (s) return JSON.parse(s);
+  } catch(e) {}
+  return { tasks: [], xp: 0, streak: 0, longestStreak: 0, lastStreakDay: null, lastOpenDay: null, completedDays: [], totalCompleted: 0 };
+}
+
+function saveState() {
+  try { localStorage.setItem('momentum_v1', JSON.stringify(state)); } catch(e) {}
+}
+</script>
